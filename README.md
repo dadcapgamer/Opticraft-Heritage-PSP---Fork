@@ -9,8 +9,11 @@ Built directly against the bare-metal PSPSDK and Allegrex MIPS architecture, thi
 ## The assets.pak Requirement
 
 The assets.pak file contains the game's core resource package (textures, fonts, sounds, UI elements, etc.) required for the engine to run.
+
 Because of file-size constraints and asset redistribution guidelines, it is not packed inside the source repository.
-How to get it: You can download assets.pak directly from the official OC Heritage community hub at https://ocheritage.vercel.app/.   
+
+How to get it: You can download assets.pak directly from the official OC Heritage community hub at https://ocheritage.vercel.app/.
+
 Placement: Once downloaded, place assets.pak into the exact same folder where your EBOOT.PBP resides on your PSP memory card (ms0:/PSP/GAME/OptiCraft/) or inside your PPSSPP emulator directory structure.   
 
 ## Features and Optimizations
