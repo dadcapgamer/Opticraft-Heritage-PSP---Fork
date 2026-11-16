@@ -83,10 +83,10 @@ You can compile OptiCraft for PSP using Windows (WSL2), Linux, or Docker.
 
 ### Building on Windows or Linux
 
-1. From Windows in the project directory, run:
-   `build psp.bat`
+1. From Windows in the project directory, open WSL and then run:
+   `./build_psp.sh`
 
-2. Or inside WSL / Linux terminal, run:
+2. Linux terminal, run:
    `bash ./build_psp.sh`
 
 The resulting `EBOOT.PBP` will be located in the project root and in `build/psp/bin/psp/EBOOT.PBP`.
