@@ -6,6 +6,13 @@ OptiCraft Heritage Edition (PSP Port) is an optimized, clean-room C++17 port of 
 
 Built directly against the bare-metal PSPSDK and Allegrex MIPS architecture, this port brings the authentic classic sandbox experience to Sony's legendary handheld while strictly respecting its tight hardware limitations (MIPS R4000 at 333 MHz, 32MB / 64MB RAM).
 
+##The assets.pak Requirement
+
+The assets.pak file contains the game's core resource package (textures, fonts, sounds, UI elements, etc.) required for the engine to run.
+Because of file-size constraints and asset redistribution guidelines, it is not packed inside the source repository.
+How to get it: You can download assets.pak directly from the official OC Heritage community hub at https://ocheritage.vercel.app/.   
+Placement: Once downloaded, place assets.pak into the exact same folder where your EBOOT.PBP resides on your PSP memory card (ms0:/PSP/GAME/OptiCraft/) or inside your PPSSPP emulator directory structure.   
+
 ## Features and Optimizations
 
 * **Optimized World Generation:** Lightweight generation algorithms configured for ultra-fast chunk creation on MIPS architecture without CPU stalls.
