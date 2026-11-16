@@ -1,0 +1,3 @@
+#pragma once
+
+#define OPTICRAFT_BUILD_ID "@OPTICRAFT_BUILD_ID@"

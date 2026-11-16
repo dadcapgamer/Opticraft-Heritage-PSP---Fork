@@ -1,0 +1,157 @@
+#include "net/minecraft/src/UiStrings.h"
+#include "GuiControls.h"
+#include "GuiSmallButton.h"
+#include "GuiButton.h"
+#include "GameSettings.h"
+#include "KeyBinding.h"
+#include "StringTranslate.h"
+#include "Minecraft.h"
+#include "platform/Input.h"
+#include "platform/PlatformConfig.h"
+#include "GuiSlider.h"
+#include "EnumOptions.h"
+#include "wii/input/GuiWiiControls.h"
+
+GuiControls::GuiControls(GuiScreen *parent, GameSettings *settings)
+	: screenTitle(uiText("Controls"))
+	, buttonId(-1)
+	, parentScreen(parent)
+	, options(settings)
+{
+}
+
+int_t GuiControls::getLeftEdge() const
+{
+	return width / 2 - 155;
+}
+
+void GuiControls::initGui()
+{
+	StringTranslate *tr = StringTranslate::getInstance();
+	int_t left = getLeftEdge();
+	displayedBindings.clear();
+	for (int_t j = 0; j < (int_t)options->keyBindings.size(); j++)
+	{
+		if (options->keyBindings[j] == options->keyBindCrafting && !options->legacyCrafting)
+			continue;
+		displayedBindings.push_back(j);
+	}
+
+	for (int_t k = 0; k < (int_t)displayedBindings.size(); k++)
+	{
+		int_t j = displayedBindings[k];
+		controlList.push_back(new GuiSmallButton(k,
+			left + (k % 2) * 160, height / 6 + 24 * (k >> 1),
+			70, 20, options->getOptionDisplayString(j)));
+	}
+	int_t nextY = height / 6 + 24 * (((int_t)displayedBindings.size() + 1) / 2);
+	controlList.push_back(new GuiSlider(EnumOptions::SENSITIVITY->returnEnumOrdinal(), width / 2 - 100, nextY,
+		EnumOptions::SENSITIVITY, options->getKeyBinding(EnumOptions::SENSITIVITY), options->getOptionFloatValue(EnumOptions::SENSITIVITY)));
+	nextY += 24;
+#ifdef WII_PLATFORM
+	controlList.push_back(new GuiButton(201, width / 2 - 100, nextY, uiText("Wii Pad Bindings...")));
+	nextY += 24;
+#endif
+	controlList.push_back(new GuiButton(200, width / 2 - 100, nextY, tr->translateKey("gui.done")));
+	screenTitle = tr->translateKey("controls.title");
+}
+
+void GuiControls::actionPerformed(GuiButton *button)
+{
+	for (int_t k = 0; k < (int_t)displayedBindings.size(); k++)
+		controlList[k]->displayString = options->getOptionDisplayString(displayedBindings[k]);
+
+	if (button->id == 200)
+	{
+		// Guard against uiText("Done") being clicked while a binding is still
+		// listening (buttonId >= 0) -- otherwise this screen goes away with
+		// pad-rebind-exclusive left stuck on, permanently breaking every
+		// other menu's button synthesis on PS2.
+		platformSetPadRebindExclusive(false);
+		mc->displayGuiScreen(parentScreen);
+		return;
+	}
+#ifdef WII_PLATFORM
+	if (button->id == 201)
+	{
+		options->saveOptions();
+		mc->displayGuiScreen(new GuiWiiControls(this, options));
+		return;
+	}
+#endif
+	if (button->id >= 0 && button->id < (int_t)displayedBindings.size())
+	{
+		buttonId = button->id;
+		int_t bindingIdx = displayedBindings[button->id];
+		button->displayString = "> " + options->getOptionDisplayString(bindingIdx) + " <";
+		platformSetPadRebindExclusive(true);
+	}
+}
+
+void GuiControls::keyTyped(char_t c, int_t key)
+{
+	if (buttonId >= 0 && buttonId < (int_t)displayedBindings.size())
+	{
+		int_t bindingIdx = displayedBindings[buttonId];
+		options->setKeyBinding(bindingIdx, key);
+		controlList[buttonId]->displayString = options->getOptionDisplayString(bindingIdx);
+		buttonId = -1;
+		platformSetPadRebindExclusive(false);
+	}
+	else
+	{
+		GuiScreen::keyTyped(c, key);
+	}
+}
+
+
+void GuiControls::mouseClicked(int_t x, int_t y, int_t button)
+{
+	if (buttonId >= 0 && buttonId < (int_t)displayedBindings.size())
+	{
+		int_t bindingIdx = displayedBindings[buttonId];
+		options->setKeyBinding(bindingIdx, -100 + button);
+		controlList[buttonId]->displayString = options->getOptionDisplayString(bindingIdx);
+		buttonId = -1;
+		platformSetPadRebindExclusive(false);
+		return;
+	}
+	GuiScreen::mouseClicked(x, y, button);
+}
+
+void GuiControls::drawScreen(int_t mouseX, int_t mouseY, float_t partialTick)
+{
+	drawDefaultBackground();
+	drawCenteredString(fontRenderer, screenTitle, width / 2, 20, 0xffffff);
+	int_t left = getLeftEdge();
+	for (int_t k = 0; k < (int_t)displayedBindings.size(); k++)
+	{
+		int_t l = displayedBindings[k];
+		bool duplicate = false;
+		for (int_t otherK = 0; otherK < (int_t)displayedBindings.size(); ++otherK)
+		{
+			int_t other = displayedBindings[otherK];
+			if (other != l && options->keyBindings[l]->keyCode == options->keyBindings[other]->keyCode)
+			{
+				duplicate = true;
+				break;
+			}
+		}
+
+		if (buttonId == k)
+			controlList[k]->displayString = "\xc2\xa7" "f> " "\xc2\xa7" "e??? " "\xc2\xa7" "f<";
+		else if (duplicate)
+			controlList[k]->displayString = std::string("\xc2\xa7" "c") + options->getOptionDisplayString(l);
+		else
+			controlList[k]->displayString = options->getOptionDisplayString(l);
+
+		drawString(fontRenderer, options->getKeyBindingDescription(l),
+		           left + (k % 2) * 160 + 70 + 6, height / 6 + 24 * (k >> 1) + 7, -1);
+	}
+	GuiScreen::drawScreen(mouseX, mouseY, partialTick);
+}
+
+bool GuiControls::isJavaUiKeyboardNavigationEnabled() const
+{
+	return buttonId < 0 && GuiScreen::isJavaUiKeyboardNavigationEnabled();
+}

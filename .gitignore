@@ -1,0 +1,79 @@
+# ==========================================
+# C++ / CMake / Ninja Build Artifacts
+# ==========================================
+build/
+bin/
+obj/
+out/
+.cmake/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CMakeUserPresets.json
+compile_commands.json
+*.cmake.in
+ninja.exe
+
+# ==========================================
+# Compiled Object & Dependency Files
+# ==========================================
+*.o
+*.d
+*.obj
+*.lib
+*.a
+*.ilk
+*.pdb
+
+# ==========================================
+# Platform Binaries & Executables
+# ==========================================
+# PSP
+*.elf
+*.prx
+*.SFO
+*.PBP
+EBOOT.PBP
+PARAM.SFO
+
+# PS2 / Wii / PC outputs
+*.elf
+*.iso
+*.dol
+*.elf.unstripped
+*.exe
+*.dll
+
+# ==========================================
+# IDEs & Text Editors
+# ==========================================
+# Visual Studio / VS Code
+.vscode/
+.idea/
+*.suo
+*.user
+*.filters
+.vs/
+
+# Vim / Emacs / General swap files
+*.swp
+*.swo
+*~
+.project
+.cproject
+
+# ==========================================
+# Operating System Generated Files
+# ==========================================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
