@@ -24,6 +24,7 @@
 #include "pc/lwjgl/Keyboard.h"
 #include "platform/Input.h"
 #include "platform/PlatformConfig.h"
+#include "platform/WorldSizePolicy.h"
 
 namespace
 {
@@ -253,15 +254,11 @@ bool LegacyCreateWorldScreen::adjustSelection(int_t direction)
         return false;
     if (selectedControlIndex == 3 && worldSizeButton != nullptr)
     {
-#if PLATFORM_PSP
-        return false;
-#else
-        worldSizeType = (worldSizeType + (direction > 0 ? 1 : 2)) % 3;
+        worldSizeType = platformCycleWorldSizeType(worldSizeType, direction);
         limitedWorld = (worldSizeType != 0);
         updateButtonText();
         mc->sndManager->playSoundFX("random.focus", 1.0f, 1.0f);
         return true;
-#endif
     }
     GuiButton *button = buttonForSelection(selectedControlIndex);
     if (button == nullptr || !button->enabled || !button->enabled2)

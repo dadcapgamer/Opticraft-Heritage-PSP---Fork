@@ -143,12 +143,13 @@
 #  define PLATFORM_PROFILE_STREAMING (PLATFORM_PS2 || PLATFORM_WII)
 #endif
 
-// PS2 region files keep a whole-region write buffer, so a modified chunk can be
-// serialized when it leaves the resident cache without forcing an immediate
-// Memory Card flush. Track gameplay edits separately from generation/lighting
-// dirtiness so walking does not turn every generated chunk into an I/O write.
+// Constrained consoles must serialize gameplay edits before a chunk leaves the
+// resident window. Track those edits separately from generation/lighting
+// dirtiness so ordinary exploration does not turn every generated chunk into
+// an I/O write. This is essential for PSP's streamed Infinite world: only the
+// nearby window remains in RAM, while modified chunks persist in region files.
 #ifndef PLATFORM_SAVE_RUNTIME_CHUNK_EDITS_ON_UNLOAD
-#  define PLATFORM_SAVE_RUNTIME_CHUNK_EDITS_ON_UNLOAD PLATFORM_PS2
+#  define PLATFORM_SAVE_RUNTIME_CHUNK_EDITS_ON_UNLOAD (PLATFORM_PS2 || PLATFORM_PSP)
 #endif
 
 #ifndef PLATFORM_PROFILE_RENDER_PHASES

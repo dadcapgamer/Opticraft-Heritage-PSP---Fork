@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-export PSPDEV=/usr/local/pspdev
+export PSPDEV="${PSPDEV:-/usr/local/pspdev}"
 export PATH="$PSPDEV/bin:$PATH"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -35,7 +35,9 @@ fi
 
 # Select CMake generator: prefer Ninja when available
 CMAKE_GEN=()
-if command -v ninja >/dev/null 2>&1; then
+if [ -f "${BUILD_DIR}/CMakeCache.txt" ]; then
+    echo "=== Existing CMake build detected: preserving its generator ==="
+elif command -v ninja >/dev/null 2>&1; then
     echo "=== Ninja build generator detected ==="
     CMAKE_GEN=("-G" "Ninja")
 fi
@@ -52,7 +54,15 @@ cmake "${SRC_DIR}" \
     -DBUILD_PRX="${BUILD_PRX:-ON}" \
     -DPSP_REMOTE_DEBUG="${PSP_REMOTE_DEBUG:-OFF}"
 
-cmake --build . --parallel $(nproc)
+if command -v nproc >/dev/null 2>&1; then
+    BUILD_JOBS="$(nproc)"
+elif command -v sysctl >/dev/null 2>&1; then
+    BUILD_JOBS="$(sysctl -n hw.ncpu 2>/dev/null || echo 4)"
+else
+    BUILD_JOBS=4
+fi
+
+cmake --build . --parallel "${BUILD_JOBS}"
 
 if command -v ccache >/dev/null 2>&1; then
     echo "=== ccache statistics after build ==="

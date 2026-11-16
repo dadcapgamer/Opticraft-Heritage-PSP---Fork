@@ -16,6 +16,7 @@
 #include "java/String.h"
 #include "pc/lwjgl/Keyboard.h"
 #include "platform/PlatformConfig.h"
+#include "platform/WorldSizePolicy.h"
 #include <algorithm>
 
 GuiCreateWorld::GuiCreateWorld(GuiScreen *parent)
@@ -32,20 +33,8 @@ GuiCreateWorld::GuiCreateWorld(GuiScreen *parent)
     , generateStructuresButton(nullptr)
     , worldTypeButton(nullptr)
     , worldSizeButton(nullptr)
-    , limitedWorld(
-#if PLATFORM_PSP
-        true
-#else
-        false
-#endif
-    )
-    , worldSizeType(
-#if PLATFORM_PSP
-        1
-#else
-        0
-#endif
-    )
+    , limitedWorld(platformDefaultWorldSizeType() != 0)
+    , worldSizeType(platformDefaultWorldSizeType())
     , seed("")
     , localizedNewWorldText(StatCollector::translateToLocal("selectWorld.newWorld"))
     , worldTypeIndex(0)
@@ -252,11 +241,9 @@ void GuiCreateWorld::actionPerformed(GuiButton *button)
     }
     else if (button->id == 7)
     {
-#if !PLATFORM_PSP
-        worldSizeType = (worldSizeType + 1) % 3;
+        worldSizeType = platformCycleWorldSizeType(worldSizeType, 1);
         limitedWorld = (worldSizeType != 0);
         updateButtonText();
-#endif
     }
     else if (button->id == 2)
     {

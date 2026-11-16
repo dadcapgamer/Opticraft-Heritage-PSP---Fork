@@ -93,5 +93,5 @@ The resulting `EBOOT.PBP` will be located in the project root and in `build/psp/
 
 ## License
 
-This project is licensed under the terms of the GPL v3 (`LICENSE`).  
+This project is licensed under the terms of the MIT License (`LICENSE`).
 Minecraft is a trademark of Mojang Synergies AB / Microsoft. This project is an independent reimplementation developed for educational and historical preservation purposes.
